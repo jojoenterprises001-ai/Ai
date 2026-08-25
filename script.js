@@ -20,12 +20,13 @@ document.getElementById('sendBtn').addEventListener('click', async () => {
     let language = document.getElementById('language').value;
     let mode = document.querySelector('input[name="mode"]:checked').value;
 
-    // Loading dikhane ke liye
     const chatBox = document.getElementById('chatBox');
-    chatBox.innerHTML += `<p><b>You:</b> ${safeQuestion}</p><p><i>Gyan Buddy soch raha hai...</i></p><hr>`;
+    
+    // Ek unique ID banate hain loading message ke liye
+    const loadId = 'load-' + Date.now();
+    chatBox.innerHTML += `<p><b>You:</b> ${safeQuestion}</p><p id="${loadId}"><i>Gyan Buddy soch raha hai...</i></p><hr>`;
     document.getElementById('userInput').value = "";
 
-    // AI se connect karna
     try {
         let response = await fetch('/api/chat', {
             method: 'POST',
@@ -34,9 +35,17 @@ document.getElementById('sendBtn').addEventListener('click', async () => {
         });
         let data = await response.json();
         
-        // Jawab dikhana
-        chatBox.innerHTML += `<p><b>Gyan Buddy:</b> ${data.answer}</p><hr>`;
+        // Loading message ko hata dein
+        document.getElementById(loadId).style.display = 'none';
+        
+        // Jawab dikhayen ya API error batayen
+        if (data.answer) {
+            chatBox.innerHTML += `<p><b>Gyan Buddy:</b> ${data.answer}</p><hr>`;
+        } else {
+            chatBox.innerHTML += `<p style="color:red;"><b>Error:</b> AI ko API key nahi mili. Please check Vercel settings.</p><hr>`;
+        }
     } catch (error) {
+        document.getElementById(loadId).style.display = 'none';
         alert("Network error! AI se connect nahi ho paya.");
     }
 });
