@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gyan Buddy AI</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h2>Gyan Buddy AI</h2>
+        <div class="menu">
+            <button id="menuBtn">⋮</button>
+            <div id="dropdown" class="dropdown-content hidden">
+                <a href="mailto:jojoenterprises001@gmail.com">Help</a>
+                <a href="#" id="aboutUs">About Us</a>
+                <span class="free-badge">Free Version</span>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="chat-container" id="chatBox">
+            <!-- Messages will appear here -->
+        </div>
+
+        <div class="input-area">
+            <select id="language">
+                <option value="hindi">Hindi</option>
+                <option value="english">English</option>
+                <option value="hinglish">Hinglish (Mix)</option>
+            </select>
+            
+            <input type="text" id="userInput" placeholder="Ask your question (5th to 12th grade)..." maxlength="250">
+            
+            <div class="mode-selector">
+                <label><input type="radio" name="mode" value="direct" checked> Direct Answer</label>
+                <label><input type="radio" name="mode" value="teacher"> Teacher Mode (Details)</label>
+            </div>
+            
+            <button id="sendBtn">Ask AI</button>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>
+
