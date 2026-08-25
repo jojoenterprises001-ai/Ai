@@ -1,4 +1,3 @@
-// 1. Menu Logic & About Us
 document.getElementById('menuBtn').addEventListener('click', () => {
     document.getElementById('dropdown').classList.toggle('hidden');
 });
@@ -7,33 +6,37 @@ document.getElementById('aboutUs').addEventListener('click', () => {
     alert("Created by Shlok Choudhary\nThis is a free educational platform.");
 });
 
-// 2. High Security Input Sanitization (XSS Protection)
 function sanitizeInput(input) {
     const div = document.createElement('div');
-    div.textContent = input; // Converts dangerous HTML tags into plain text
+    div.textContent = input;
     return div.innerHTML;
 }
 
-// 3. Handle Question and Modes
-document.getElementById('sendBtn').addEventListener('click', () => {
+document.getElementById('sendBtn').addEventListener('click', async () => {
     let rawInput = document.getElementById('userInput').value;
-    
-    // Validation: Empty input check
-    if (rawInput.trim() === "") {
-        alert("Please ask a question first!");
-        return;
-    }
+    if (rawInput.trim() === "") { alert("Please ask a question first!"); return; }
 
-    // Secure the input
     let safeQuestion = sanitizeInput(rawInput);
     let language = document.getElementById('language').value;
     let mode = document.querySelector('input[name="mode"]:checked').value;
 
-    console.log("Safe Question:", safeQuestion);
-    console.log("Mode:", mode);
-    console.log("Language:", language);
+    // Loading dikhane ke liye
+    const chatBox = document.getElementById('chatBox');
+    chatBox.innerHTML += `<p><b>You:</b> ${safeQuestion}</p><p><i>Gyan Buddy soch raha hai...</i></p><hr>`;
+    document.getElementById('userInput').value = "";
 
-    // AI API integration will go here (Next Step)
-    document.getElementById('userInput').value = ""; 
+    // AI se connect karna
+    try {
+        let response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ question: safeQuestion, mode: mode, language: language })
+        });
+        let data = await response.json();
+        
+        // Jawab dikhana
+        chatBox.innerHTML += `<p><b>Gyan Buddy:</b> ${data.answer}</p><hr>`;
+    } catch (error) {
+        alert("Network error! AI se connect nahi ho paya.");
+    }
 });
-
