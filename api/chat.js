@@ -88,8 +88,7 @@ IMPORTANT RULES:
 `;
 
   try {
-    const MODEL = "gemini-2.5-flash-lite";
-
+    const MODEL = "gemini-3.5-flash-lite";
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`,
       {
