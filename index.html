@@ -1,47 +1,626 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gyan Buddy AI</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+  >
+
+  <meta name="theme-color" content="#0b0b12">
+
+  <title>Study.ai - AI Teacher</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #08080d;
+      color: #ffffff;
+    }
+
+    body {
+      overscroll-behavior: none;
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    .app {
+      width: 100%;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      background:
+        radial-gradient(
+          circle at 0% 0%,
+          rgba(126, 87, 255, 0.20),
+          transparent 34%
+        ),
+        radial-gradient(
+          circle at 100% 100%,
+          rgba(0, 200, 255, 0.12),
+          transparent 35%
+        ),
+        #08080d;
+    }
+
+    /* =========================
+       HEADER
+    ========================= */
+
+    .header {
+      height: 64px;
+      min-height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 15px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      background: rgba(10,10,17,0.86);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      z-index: 10;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo {
+      width: 39px;
+      height: 39px;
+      border-radius: 13px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #8b5cf6, #4f46e5);
+      box-shadow: 0 8px 25px rgba(99,102,241,0.30);
+      font-size: 20px;
+    }
+
+    .brand-text h1 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    .brand-text span {
+      display: block;
+      margin-top: 2px;
+      font-size: 10px;
+      color: #90909e;
+    }
+
+    .about-btn {
+      width: 36px;
+      height: 36px;
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.06);
+      color: #ffffff;
+      font-size: 17px;
+      cursor: pointer;
+    }
+
+    /* =========================
+       CHAT AREA
+    ========================= */
+
+    .messages {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 20px 13px 18px;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+    }
+
+    .messages::-webkit-scrollbar {
+      width: 3px;
+    }
+
+    .messages::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.15);
+      border-radius: 10px;
+    }
+
+    .welcome {
+      min-height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 12px;
+      text-align: center;
+    }
+
+    .welcome-box {
+      width: 100%;
+      max-width: 340px;
+    }
+
+    .welcome-icon {
+      width: 70px;
+      height: 70px;
+      margin: 0 auto 17px;
+      border-radius: 23px;
+      display: grid;
+      place-items: center;
+      font-size: 31px;
+      background: rgba(139,92,246,0.14);
+      border: 1px solid rgba(139,92,246,0.25);
+      box-shadow: 0 15px 45px rgba(80,60,190,0.12);
+    }
+
+    .welcome h2 {
+      margin: 0 0 9px;
+      font-size: 25px;
+      letter-spacing: -0.5px;
+    }
+
+    .welcome p {
+      margin: 0;
+      line-height: 1.55;
+      color: #9999a8;
+      font-size: 14px;
+    }
+
+    .examples {
+      margin-top: 22px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 7px;
+    }
+
+    .example {
+      padding: 8px 11px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.045);
+      color: #b9b9c5;
+      font-size: 11px;
+    }
+
+    /* =========================
+       CHAT MESSAGES
+    ========================= */
+
+    .message-row {
+      display: flex;
+      margin: 0 auto 17px;
+      max-width: 820px;
+      animation: messageIn 0.22s ease;
+    }
+
+    .message-row.user {
+      justify-content: flex-end;
+    }
+
+    .message-row.ai {
+      justify-content: flex-start;
+    }
+
+    @keyframes messageIn {
+      from {
+        opacity: 0;
+        transform: translateY(7px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .message {
+      max-width: 88%;
+      padding: 12px 14px;
+      border-radius: 18px;
+      font-size: 15px;
+      line-height: 1.58;
+      overflow-wrap: anywhere;
+    }
+
+    .user .message {
+      background: linear-gradient(135deg, #7056e8, #5945c9);
+      border-bottom-right-radius: 5px;
+      box-shadow: 0 8px 25px rgba(80,60,190,0.18);
+    }
+
+    .ai .message {
+      background: rgba(255,255,255,0.055);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-bottom-left-radius: 5px;
+      color: #eeeeF4;
+    }
+
+    .message strong {
+      color: #ffffff;
+    }
+
+    .message code {
+      padding: 2px 5px;
+      border-radius: 5px;
+      background: rgba(0,0,0,0.35);
+      font-size: 13px;
+    }
+
+    .message pre {
+      margin: 10px 0;
+      padding: 12px;
+      overflow-x: auto;
+      border-radius: 10px;
+      background: #050509;
+      border: 1px solid rgba(255,255,255,0.08);
+      font-size: 12px;
+      white-space: pre-wrap;
+    }
+
+    /* =========================
+       TYPING
+    ========================= */
+
+    .typing {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+      padding: 5px 2px;
+    }
+
+    .typing span {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #aaaabb;
+      animation: typing 1s infinite;
+    }
+
+    .typing span:nth-child(2) {
+      animation-delay: 0.15s;
+    }
+
+    .typing span:nth-child(3) {
+      animation-delay: 0.3s;
+    }
+
+    @keyframes typing {
+      0%, 60%, 100% {
+        transform: translateY(0);
+        opacity: 0.4;
+      }
+
+      30% {
+        transform: translateY(-4px);
+        opacity: 1;
+      }
+    }
+
+    /* =========================
+       INPUT
+    ========================= */
+
+    .input-area {
+      padding: 9px 12px calc(9px + env(safe-area-inset-bottom));
+      background: rgba(9,9,15,0.92);
+      border-top: 1px solid rgba(255,255,255,0.07);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      z-index: 10;
+    }
+
+    .input-box {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      max-width: 850px;
+      margin: auto;
+      padding: 7px 7px 7px 14px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.09);
+    }
+
+    #userInput {
+      flex: 1;
+      min-width: 0;
+      max-height: 120px;
+      resize: none;
+      outline: none;
+      border: 0;
+      background: transparent;
+      color: #ffffff;
+      font-size: 15px;
+      line-height: 1.45;
+      padding: 8px 0;
+    }
+
+    #userInput::placeholder {
+      color: #777786;
+    }
+
+    #sendBtn {
+      flex: 0 0 42px;
+      width: 42px;
+      height: 42px;
+      border: 0;
+      border-radius: 15px;
+      color: white;
+      background: linear-gradient(135deg, #8b5cf6, #5b4bd8);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    #sendBtn:active {
+      transform: scale(0.92);
+    }
+
+    #sendBtn:disabled {
+      opacity: 0.45;
+    }
+
+    .credit {
+      text-align: center;
+      color: #5f5f6c;
+      font-size: 9px;
+      margin-top: 6px;
+    }
+
+    /* =========================
+       ABOUT MODAL
+    ========================= */
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 12px;
+      background: rgba(0,0,0,0.58);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 100;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 480px;
+      padding: 22px 19px 20px;
+      border-radius: 24px;
+      background: #15151e;
+      border: 1px solid rgba(255,255,255,0.09);
+      box-shadow: 0 -10px 50px rgba(0,0,0,0.35);
+      animation: modalIn 0.22s ease;
+    }
+
+    @keyframes modalIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .modal-card h3 {
+      margin: 0 0 8px;
+      font-size: 21px;
+    }
+
+    .modal-card p {
+      margin: 7px 0;
+      color: #a4a4b1;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .email {
+      display: inline-block;
+      margin-top: 8px;
+      color: #a78bfa;
+      text-decoration: none;
+      font-size: 13px;
+    }
+
+    .close-btn {
+      width: 100%;
+      height: 44px;
+      margin-top: 18px;
+      border: 0;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.08);
+      color: white;
+      cursor: pointer;
+    }
+
+    @media (min-width: 700px) {
+      .messages {
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+
+      .message {
+        max-width: 75%;
+      }
+    }
+  </style>
 </head>
+
 <body>
-    <header>
-        <h2>Gyan Buddy AI</h2>
-        <div class="menu">
-            <button id="menuBtn">⋮</button>
-            <div id="dropdown" class="dropdown-content hidden">
-                <a href="mailto:jojoenterprises001@gmail.com">Help</a>
-                <a href="#" id="aboutUs">About Us</a>
-                <span class="free-badge">Free Version</span>
-            </div>
+
+  <main class="app">
+
+    <!-- HEADER -->
+    <header class="header">
+
+      <div class="brand">
+
+        <div class="logo">✦</div>
+
+        <div class="brand-text">
+          <h1>Study.ai</h1>
+          <span>Your AI Teacher</span>
         </div>
+
+      </div>
+
+      <button
+        class="about-btn"
+        id="aboutBtn"
+        aria-label="About and Help"
+      >
+        ?
+      </button>
+
     </header>
 
-    <main>
-        <div class="chat-container" id="chatBox">
-            <!-- Messages will appear here -->
+
+    <!-- CHAT -->
+    <section class="messages" id="messages">
+
+      <div class="welcome" id="welcome">
+
+        <div class="welcome-box">
+
+          <div class="welcome-icon">
+            🎓
+          </div>
+
+          <h2>How can I help you?</h2>
+
+          <p>
+            Ask any question and Study.ai will explain
+            the answer step-by-step like a teacher.
+          </p>
+
+          <div class="examples">
+
+            <div class="example">
+              📐 Maths
+            </div>
+
+            <div class="example">
+              🔬 Science
+            </div>
+
+            <div class="example">
+              📚 English
+            </div>
+
+            <div class="example">
+              🌎 GK
+            </div>
+
+          </div>
+
         </div>
 
-        <div class="input-area">
-            <select id="language">
-                <option value="hindi">Hindi</option>
-                <option value="english">English</option>
-                <option value="hinglish">Hinglish (Mix)</option>
-            </select>
-            
-            <input type="text" id="userInput" placeholder="Ask your question (5th to 12th grade)..." maxlength="250">
-            
-            <div class="mode-selector">
-                <label><input type="radio" name="mode" value="direct" checked> Direct Answer</label>
-                <label><input type="radio" name="mode" value="teacher"> Teacher Mode (Details)</label>
-            </div>
-            
-            <button id="sendBtn">Ask AI</button>
-        </div>
-    </main>
-    <script src="script.js"></script>
+      </div>
+
+    </section>
+
+
+    <!-- INPUT -->
+    <footer class="input-area">
+
+      <div class="input-box">
+
+        <textarea
+          id="userInput"
+          rows="1"
+          placeholder="Ask your question..."
+          autocomplete="off"
+          spellcheck="true"
+        ></textarea>
+
+        <button
+          id="sendBtn"
+          type="button"
+          aria-label="Send"
+        >
+          ➤
+        </button>
+
+      </div>
+
+      <div class="credit">
+        Study.ai is created by Shlok Choudhary
+      </div>
+
+    </footer>
+
+  </main>
+
+
+  <!-- ABOUT / HELP MODAL -->
+
+  <div class="modal" id="aboutModal">
+
+    <div class="modal-card">
+
+      <h3>About Study.ai</h3>
+
+      <p>
+        Study.ai is an AI learning assistant designed to
+        help students understand questions with simple,
+        step-by-step explanations.
+      </p>
+
+      <p>
+        Ask a question and Study.ai will try to explain
+        not only the answer, but also how the answer was reached.
+      </p>
+
+      <a
+        class="email"
+        href="mailto:jojoenterprises001@gmail.com"
+      >
+        jojoenterprises001@gmail.com
+      </a>
+
+      <button
+        class="close-btn"
+        id="closeModal"
+        type="button"
+      >
+        Close
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <script src="script.js"></script>
+
 </body>
 </html>
-
